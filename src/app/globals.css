@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
+
+  --color-indigo-50: #f5f3ff;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+
+  --border: #e2e8f0;
+  --ring: #6366f1;
+
+  --radius: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #f8fafc;
+
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+
+    --accent: #334155;
+    --accent-foreground: #f8fafc;
+
+    --border: #334155;
+  }
+}
+
+* {
+  border-color: var(--border);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+}
+
+.animate-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
