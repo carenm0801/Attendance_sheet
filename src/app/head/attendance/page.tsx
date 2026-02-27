@@ -449,9 +449,9 @@ export default function HeadAttendancePage() {
                                                         <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-bold text-slate-500">{group.students.length}명</span>
                                                         {/* 담당 선생님 이름 뱃지 */}
                                                         {group.teacherName && (
-                                                            <span className="rounded-full bg-indigo-50 border border-indigo-100 px-3 py-0.5 text-xs font-bold text-indigo-500">
+                                                            <h2 className="text-xl font-black text-indigo-500">
                                                                 👩‍🏫 {group.teacherName} 선생님
-                                                            </span>
+                                                            </h2>
                                                         )}
                                                     </div>
                                                     <div>
