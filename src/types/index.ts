@@ -3,6 +3,9 @@ export type Teacher = {
     name: string;
     class_id: string;
     photo_url?: string | null;
+    phone?: string | null;       // 전화번호
+    address?: string | null;     // 주소
+    memo?: string | null;        // 메모
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     classes?: any;
 };
@@ -17,6 +20,10 @@ export type Student = {
     name: string;
     photo_url: string | null;
     class_id: string;
+    parent_name?: string | null;  // 부모님 이름
+    parent_phone?: string | null; // 부모님 전화번호
+    address?: string | null;      // 주소
+    memo?: string | null;         // 메모/특이사항
 };
 
 export type Attendance = {
