@@ -315,19 +315,25 @@ export default function TeacherDetailPage({
                         </div>
                     </header>
 
-                    {/* ── 통계 배지 ────────────────────────────────────────── */}
-                    <div className="flex flex-wrap gap-3 animate-in" style={{ animationDelay: "0.1s" }}>
-                        <div className="rounded-2xl bg-white dark:bg-slate-800 px-5 py-3 shadow-md ring-1 ring-slate-100 dark:ring-slate-700">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">전체</span>
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {checkedCount}<span className="text-sm font-semibold text-slate-400"> / {students.length}</span>
-                            </div>
+                    {/* ── 출석 현황 카드 ────────────────────────────────────── */}
+                    <div className="rounded-2xl bg-white dark:bg-slate-800 px-6 py-4 shadow-md ring-1 ring-slate-100 dark:ring-slate-700 animate-in" style={{ animationDelay: "0.1s" }}>
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-bold text-slate-500">오늘 출석 현황</span>
+                            <span className="text-sm font-black text-slate-900 dark:text-white">
+                                <span className="text-indigo-600 text-xl">{checkedCount}</span>
+                                <span className="text-slate-400 font-semibold"> / {students.length}명</span>
+                            </span>
                         </div>
-                        {/* 출석 배지만 표시 */}
-                        <div className={cn("rounded-2xl px-5 py-3 shadow-md", STATUS_CONFIG["출석"].cardBg, STATUS_CONFIG["출석"].shadow)}>
-                            <span className={cn("text-xs font-bold uppercase tracking-widest opacity-80", STATUS_CONFIG["출석"].cardText)}>출석</span>
-                            <div className={cn("text-2xl font-black", STATUS_CONFIG["출석"].cardText)}>{stats["출석"]}</div>
+                        {/* 진행률 바 */}
+                        <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                            <div
+                                className="h-3 rounded-full bg-indigo-500 transition-all duration-500"
+                                style={{ width: students.length > 0 ? `${Math.round((checkedCount / students.length) * 100)}%` : "0%" }}
+                            />
                         </div>
+                        <p className="mt-2 text-xs text-slate-400 text-right font-semibold">
+                            {students.length > 0 ? Math.round((checkedCount / students.length) * 100) : 0}% 출석
+                        </p>
                     </div>
 
                     {/* ── 학생 카드 그리드 ──────────────────────────────────── */}
