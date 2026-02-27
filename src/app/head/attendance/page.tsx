@@ -445,14 +445,15 @@ export default function HeadAttendancePage() {
                                                 <div className="mb-4 flex items-center justify-between">
                                                     <div className="flex items-center gap-3 flex-wrap">
                                                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100"><Sparkles className="h-4 w-4 text-indigo-500" /></div>
-                                                        <h2 className="text-xl font-black text-slate-900 dark:text-white">{group.className}</h2>
-                                                        <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-bold text-slate-500">{group.students.length}명</span>
-                                                        {/* 담당 선생님 이름 뱃지 */}
-                                                        {group.teacherName && (
-                                                            <h2 className="text-xl font-black text-indigo-500">
-                                                                👩‍🏫 {group.teacherName} 선생님
-                                                            </h2>
-                                                        )}
+                                                        {/* 유년1반(김하늘 선생님) 4명 형식 */}
+                                                        <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                                                            {group.className}
+                                                            {group.teacherName && (
+                                                                <span className="text-slate-400 font-black">({group.teacherName} 선생님)</span>
+                                                            )}
+                                                            {" "}
+                                                            <span className="text-indigo-500">{group.students.length}명</span>
+                                                        </h2>
                                                     </div>
                                                     <div>
                                                         <span className="text-sm font-black text-indigo-600">{groupChecked}</span>
