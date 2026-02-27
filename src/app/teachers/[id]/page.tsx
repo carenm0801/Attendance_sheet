@@ -323,12 +323,11 @@ export default function TeacherDetailPage({
                                 {checkedCount}<span className="text-sm font-semibold text-slate-400"> / {students.length}</span>
                             </div>
                         </div>
-                        {(["출석", "지각", "결석", "조퇴"] as StatusKey[]).map((s) => (
-                            <div key={s} className={cn("rounded-2xl px-5 py-3 shadow-md", STATUS_CONFIG[s].cardBg, STATUS_CONFIG[s].shadow)}>
-                                <span className={cn("text-xs font-bold uppercase tracking-widest opacity-80", STATUS_CONFIG[s].cardText)}>{s}</span>
-                                <div className={cn("text-2xl font-black", STATUS_CONFIG[s].cardText)}>{stats[s]}</div>
-                            </div>
-                        ))}
+                        {/* 출석 배지만 표시 */}
+                        <div className={cn("rounded-2xl px-5 py-3 shadow-md", STATUS_CONFIG["출석"].cardBg, STATUS_CONFIG["출석"].shadow)}>
+                            <span className={cn("text-xs font-bold uppercase tracking-widest opacity-80", STATUS_CONFIG["출석"].cardText)}>출석</span>
+                            <div className={cn("text-2xl font-black", STATUS_CONFIG["출석"].cardText)}>{stats["출석"]}</div>
+                        </div>
                     </div>
 
                     {/* ── 학생 카드 그리드 ──────────────────────────────────── */}
