@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 type ClassGroup = {
     classId: string;
     className: string;
+    teacherName?: string; // 담당 선생님 이름
     students: Student[];
 };
 
@@ -118,12 +119,19 @@ export default function HeadAttendancePage() {
             setLoading(true);
             const { data: classes } = await supabase.from("classes").select("id, name").order("name");
             const { data: students } = await supabase.from("students").select("id, name, photo_url, class_id").order("name");
+            // 선생님 정보 로드 (반별 담당 선생님 이름 표시용)
+            const { data: teachers } = await supabase.from("teachers").select("name, class_id");
 
             if (classes && students) {
+                // 반 ID → 선생님 이름 매핑
+                const teacherMap: Record<string, string> = {};
+                teachers?.forEach(t => { teacherMap[t.class_id] = t.name; });
+
                 // 반별 그룹화 (출석체크 탭용)
                 const groups: ClassGroup[] = classes.map((cls) => ({
                     classId: cls.id,
                     className: cls.name,
+                    teacherName: teacherMap[cls.id], // 담당 선생님 이름
                     students: students.filter((s) => s.class_id === cls.id),
                 })).filter((g) => g.students.length > 0);
                 setClassGroups(groups);
@@ -435,10 +443,16 @@ export default function HeadAttendancePage() {
                                         return (
                                             <section key={group.classId} className="animate-in" style={{ animationDelay: `${0.1 + groupIndex * 0.05}s` }}>
                                                 <div className="mb-4 flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-3 flex-wrap">
                                                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100"><Sparkles className="h-4 w-4 text-indigo-500" /></div>
                                                         <h2 className="text-xl font-black text-slate-900 dark:text-white">{group.className}</h2>
                                                         <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-bold text-slate-500">{group.students.length}명</span>
+                                                        {/* 담당 선생님 이름 뱃지 */}
+                                                        {group.teacherName && (
+                                                            <span className="rounded-full bg-indigo-50 border border-indigo-100 px-3 py-0.5 text-xs font-bold text-indigo-500">
+                                                                👩‍🏫 {group.teacherName} 선생님
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <span className="text-sm font-black text-indigo-600">{groupChecked}</span>
