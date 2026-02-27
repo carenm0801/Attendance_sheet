@@ -275,11 +275,7 @@ export default function TeacherDetailPage({
                             </Link>
                             <div>
                                 <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white">
-                                    {teacher.classes?.name}{" "}
-                                    <span className="text-indigo-600">출석부</span>
-                                    <span className="ml-2 text-2xl font-bold text-slate-400">
-                                        {teacher.name} 선생님
-                                    </span>
+                                    {teacher.classes?.name}<span className="text-indigo-600">({teacher.name} 선생님)</span>
                                 </h1>
                             </div>
                         </div>
