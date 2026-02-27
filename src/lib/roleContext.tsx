@@ -27,6 +27,14 @@ export const permissions = {
     canManageClasses: (role: Role) => role === "admin",
     // 관리자 전체 메뉴 접근
     isAdmin: (role: Role) => role === "admin",
+    // 학생 정보 수정 (일반 선생님은 본인 반만, 부장/관리자는 전체)
+    canEditStudentInfo: (role: Role, teacherClassId?: string, studentClassId?: string) => {
+        if (role === "admin" || role === "head_teacher") return true;
+        if (role === "teacher") return teacherClassId === studentClassId;
+        return false;
+    },
+    // 선생님 정보 수정 (부장/관리자만)
+    canEditTeacherInfo: (role: Role) => role === "admin" || role === "head_teacher",
 };
 
 // ─── Context ──────────────────────────────────────────────────────

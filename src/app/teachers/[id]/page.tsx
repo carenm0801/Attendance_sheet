@@ -7,7 +7,7 @@ import {
     ChevronLeft, User, Sparkles, Calendar,
     CheckCircle2, Clock, XCircle, LogOut,
     ChevronLeft as Prev, ChevronRight as Next,
-    BarChart3
+    BarChart3, Phone, MapPin, FileText, Edit3, Save
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -99,18 +99,29 @@ export default function TeacherDetailPage({
     const { roleInfo } = useRole();
     // 부장선생님만 출석 체크 가능
     const canCheck = permissions.canCheckAttendance(roleInfo.role);
+    // 부장/관리자만 선생님 정보 수정 가능
+    const canEditTeacher = permissions.canEditTeacherInfo(roleInfo.role);
+    // 선생님 정보 편집 상태
+    const [teacherEditing, setTeacherEditing] = useState(false);
+    const [teacherForm, setTeacherForm] = useState({ phone: "", address: "", memo: "" });
+    const [teacherSaving, setTeacherSaving] = useState(false);
 
     // ─── 선생님 & 학생 정보 로드 (최초 1회) ─────────────────────────
     useEffect(() => {
         async function fetchBase() {
             const { data: teacherData } = await supabase
                 .from("teachers")
-                .select("id, name, class_id, classes(name)")
+                .select("id, name, class_id, photo_url, phone, address, memo, classes(name)")
                 .eq("id", teacherId)
                 .single();
 
             if (teacherData) {
                 setTeacher(teacherData);
+                setTeacherForm({
+                    phone: teacherData.phone || "",
+                    address: teacherData.address || "",
+                    memo: teacherData.memo || "",
+                });
                 const { data: studentData } = await supabase
                     .from("students")
                     .select("*")
@@ -193,6 +204,20 @@ export default function TeacherDetailPage({
         { 출석: 0, 지각: 0, 결석: 0, 조퇴: 0 } as Record<StatusKey, number>
     );
     const checkedCount = Object.keys(attendanceMap).length;
+
+    // ─── 선생님 정보 저장 ──────────────────────────────────────────
+    async function saveTeacherInfo() {
+        setTeacherSaving(true);
+        const { error } = await supabase.from("teachers").update({
+            phone: teacherForm.phone.trim() || null,
+            address: teacherForm.address.trim() || null,
+            memo: teacherForm.memo.trim() || null,
+        }).eq("id", teacherId);
+        setTeacherSaving(false);
+        if (error) { alert("저장 실패: " + error.message); return; }
+        setTeacher((prev: Teacher | null) => prev ? { ...prev, ...teacherForm } : prev);
+        setTeacherEditing(false);
+    }
 
     if (loading) {
         return (
@@ -315,7 +340,84 @@ export default function TeacherDetailPage({
                         </div>
                     </header>
 
-                    {/* ── 출석 현황 카드 ────────────────────────────────────── */}
+                    {/* ── 선생님 프로필 카드 ────────────────────────────── */}
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md ring-1 ring-slate-100 dark:ring-slate-700 overflow-hidden animate-in" style={{ animationDelay: "0.05s" }}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50 dark:border-slate-700">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">선생님 연락처</p>
+                            {canEditTeacher && !teacherEditing && (
+                                <button onClick={() => setTeacherEditing(true)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-all">
+                                    <Edit3 className="h-3.5 w-3.5" /> 수정
+                                </button>
+                            )}
+                        </div>
+                        {teacherEditing ? (
+                            <div className="p-6 space-y-4">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1 block">전화번호</label>
+                                    <input type="tel" value={teacherForm.phone}
+                                        onChange={e => setTeacherForm(f => ({ ...f, phone: e.target.value }))}
+                                        placeholder="010-0000-0000"
+                                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1 block">주소</label>
+                                    <input type="text" value={teacherForm.address}
+                                        onChange={e => setTeacherForm(f => ({ ...f, address: e.target.value }))}
+                                        placeholder="예) 서울시 강남구"
+                                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1 block">메모</label>
+                                    <textarea value={teacherForm.memo}
+                                        onChange={e => setTeacherForm(f => ({ ...f, memo: e.target.value }))}
+                                        placeholder="기타 메모..."
+                                        rows={2}
+                                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none" />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setTeacherEditing(false)}
+                                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-all">취소</button>
+                                    <button onClick={saveTeacherInfo} disabled={teacherSaving}
+                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-all">
+                                        {teacherSaving ? <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="h-4 w-4" />}
+                                        저장
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-50 dark:divide-slate-700">
+                                <div className="px-6 py-3 flex items-center gap-3">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green-50"><Phone className="h-4 w-4 text-green-400" /></div>
+                                    <div className="flex-1">
+                                        <p className="text-[11px] text-slate-400 font-semibold">전화번호</p>
+                                        {teacher.phone
+                                            ? <a href={`tel:${teacher.phone}`} className="text-sm font-bold text-indigo-600 hover:underline">{teacher.phone}</a>
+                                            : <p className="text-sm text-slate-300">미입력</p>}
+                                    </div>
+                                    {teacher.phone && (
+                                        <a href={`sms:${teacher.phone}`} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-green-50 text-green-600 text-xs font-bold hover:bg-green-100">💬 문자</a>
+                                    )}
+                                </div>
+                                <div className="px-6 py-3 flex items-center gap-3">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-orange-50"><MapPin className="h-4 w-4 text-orange-400" /></div>
+                                    <div>
+                                        <p className="text-[11px] text-slate-400 font-semibold">주소</p>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white">{teacher.address || <span className="text-slate-300 font-normal">미입력</span>}</p>
+                                    </div>
+                                </div>
+                                <div className="px-6 py-3 flex items-start gap-3">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-purple-50"><FileText className="h-4 w-4 text-purple-400" /></div>
+                                    <div>
+                                        <p className="text-[11px] text-slate-400 font-semibold">메모</p>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white whitespace-pre-wrap">{teacher.memo || <span className="text-slate-300 font-normal">미입력</span>}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── 출석 현황 카드 ──────────────────────────────────── */}
                     <div className="rounded-2xl bg-white dark:bg-slate-800 px-6 py-4 shadow-md ring-1 ring-slate-100 dark:ring-slate-700 animate-in" style={{ animationDelay: "0.1s" }}>
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-sm font-bold text-slate-500">오늘 출석 현황</span>
